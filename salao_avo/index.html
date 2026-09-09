@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salão — Painel Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h1>Rosário CIA</h1>
+    <span>Painel Administrativo</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <span class="nav-icon">◈</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('agendamentos')">
+      <span class="nav-icon">◷</span> Agendamentos
+    </div>
+    <div class="nav-item" onclick="navigate('clientes')">
+      <span class="nav-icon">◯</span> Clientes
+    </div>
+    <div class="nav-item" onclick="navigate('profissionais')">
+      <span class="nav-icon">◈</span> Profissionais
+    </div>
+    <div class="nav-item" onclick="navigate('servicos')">
+      <span class="nav-icon">◇</span> Serviços
+    </div>
+    <div class="nav-item" onclick="navigate('comissoes')">
+      <span class="nav-icon">◇</span> Comissões
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    API: <code style="font-size:10px;">localhost:3000</code>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div id="pageTitle" class="page-title">Dashboard</div>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <section id="sec-dashboard" class="section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Agendamentos</div>
+          <div class="stat-value" id="stat-agendamentos">—</div>
+          <div class="stat-sub">total cadastrado</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Clientes</div>
+          <div class="stat-value" id="stat-clientes">—</div>
+          <div class="stat-sub">na base</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Profissionais</div>
+          <div class="stat-value" id="stat-profissionais">—</div>
+          <div class="stat-sub">ativos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Serviços</div>
+          <div class="stat-value" id="stat-servicos">—</div>
+          <div class="stat-sub">disponíveis</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h2>Agendamentos Recentes</h2>
+          <button class="btn btn-sm" onclick="navigate('agendamentos')">Ver todos</button>
+        </div>
+        <div id="dashboard-agendamentos"><div class="loading">Carregando...</div></div>
+      </div>
+    </section>
+
+    <!-- AGENDAMENTOS -->
+    <section id="sec-agendamentos" class="section">
+      <div class="table-card">
+        <div class="table-header">
+          <h2>Agendamentos</h2>
+        </div>
+        <div id="lista-agendamentos"><div class="loading">Carregando...</div></div>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="sec-clientes" class="section">
+      <div class="table-card">
+        <div class="table-header">
+          <h2>Clientes</h2>
+        </div>
+        <div id="lista-clientes"><div class="loading">Carregando...</div></div>
+      </div>
+    </section>
+
+    <!-- PROFISSIONAIS -->
+    <section id="sec-profissionais" class="section">
+      <div class="table-card">
+        <div class="table-header">
+          <h2>Profissionais</h2>
+        </div>
+        <div id="lista-profissionais"><div class="loading">Carregando...</div></div>
+      </div>
+    </section>
+
+    <!-- SERVIÇOS -->
+    <section id="sec-servicos" class="section">
+      <div class="table-card">
+        <div class="table-header">
+          <h2>Serviços</h2>
+        </div>
+        <div id="lista-servicos"><div class="loading">Carregando...</div></div>
+      </div>
+    </section>
+
+    <!-- COMISSÕES -->
+    <section id="sec-comissoes" class="section">
+      <div class="table-card" style="margin-bottom: 20px; padding: 20px;">
+        <h2>Fechamento de Comissões</h2>
+        <div class="form-row" style="margin-top: 15px;">
+          <div class="form-group" style="flex: 2;">
+            <label class="form-label">Profissional</label>
+            <select class="form-select" id="comissao-profissional"></select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">Data de Fechamento</label>
+            <input class="form-input" type="date" id="comissao-data">
+          </div>
+          <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button class="btn btn-primary" onclick="calcularComissoes()">Calcular Fechamento</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-card" id="resultado-comissoes" style="display: none;">
+        <div class="table-header">
+          <h2>Resultado do Fechamento</h2>
+          <h2 style="color: #2e7d32;" id="comissoes-total-display">R$ 0,00</h2>
+        </div>
+        <div id="lista-comissoes"></div>
+        <div style="margin-top: 20px; text-align: right;">
+          <button class="btn btn-primary" id="btn-pagar-comissoes" onclick="registrarPagamento()">Confirmar e Registrar Pagamento</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Modal Cliente -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-cliente-title">Novo Cliente</h3>
+      <button class="modal-close" onclick="closeModal('modal-cliente')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cliente-id">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input class="form-input" id="cliente-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone *</label>
+        <input class="form-input" id="cliente-telefone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações / Alergias</label>
+        <textarea class="form-textarea" id="cliente-obs" placeholder="Alergias, preferências..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Profissional -->
+<div class="modal-overlay" id="modal-profissional">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-profissional-title">Novo Profissional</h3>
+      <button class="modal-close" onclick="closeModal('modal-profissional')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="profissional-id">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input class="form-input" id="profissional-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input class="form-input" id="profissional-telefone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comissão (%)</label>
+          <input class="form-input" id="profissional-comissao" type="number" min="0" max="100" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Especialidade</label>
+        <input class="form-input" id="profissional-especialidade" placeholder="Ex: Coloração, Corte...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="profissional-ativo">
+          <option value="1">Ativo</option>
+          <option value="0">Inativo</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-profissional')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarProfissional()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Serviço -->
+<div class="modal-overlay" id="modal-servico">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-servico-title">Novo Serviço</h3>
+      <button class="modal-close" onclick="closeModal('modal-servico')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="servico-id">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input class="form-input" id="servico-nome" placeholder="Ex: Corte feminino">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea class="form-textarea" id="servico-descricao" placeholder="Descrição do serviço..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Preço Base (R$) *</label>
+          <input class="form-input" id="servico-preco" type="number" min="0" step="0.01" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duração (min) *</label>
+          <input class="form-input" id="servico-duracao" type="number" min="1" placeholder="60">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-servico')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarServico()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agendamento -->
+<div class="modal-overlay" id="modal-agendamento">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Novo Agendamento</h3>
+      <button class="modal-close" onclick="closeModal('modal-agendamento')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Cliente *</label>
+        <select class="form-select" id="ag-cliente"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Profissional *</label>
+        <select class="form-select" id="ag-profissional"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Serviço *</label>
+        <select class="form-select" id="ag-servico"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Início *</label>
+          <input class="form-input" id="ag-inicio" type="datetime-local">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fim *</label>
+          <input class="form-input" id="ag-fim" type="datetime-local">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Valor Final (R$)</label>
+        <input class="form-input" id="ag-valor" type="number" min="0" step="0.01" placeholder="0,00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <textarea class="form-textarea" id="ag-obs" placeholder="Observações..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-agendamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAgendamento()">Agendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Status Agendamento -->
+<div class="modal-overlay" id="modal-status">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Atualizar Status</h3>
+      <button class="modal-close" onclick="closeModal('modal-status')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="status-id">
+      <div class="form-group">
+        <label class="form-label">Novo Status</label>
+        <select class="form-select" id="status-valor">
+          <option value="Pendente">Pendente</option>
+          <option value="Confirmado">Confirmado</option>
+          <option value="Concluido e pago">Concluído e pago</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-status')">Cancelar</button>
+      <button class="btn btn-primary" onclick="atualizarStatus()">Atualizar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000/api';
+let currentSection = 'dashboard';
+
+// ─── NAVIGATION ───────────────────────────────────────────
+function navigate(section) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById(`sec-${section}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(section === 'dashboard' ? 'dashboard'
+      : section === 'agendamentos' ? 'agend'
+      : section === 'clientes' ? 'clien'
+      : section === 'profissionais' ? 'profis'
+      : section === 'comissoes' ? 'comis'
+      : 'serviç')) n.classList.add('active');
+  });
+
+  const titles = { dashboard: 'Dashboard', agendamentos: 'Agendamentos', clientes: 'Clientes', profissionais: 'Profissionais', servicos: 'Serviços', comissoes: 'Comissões e Pagamentos' };
+  document.getElementById('pageTitle').textContent = titles[section];
+
+  const actions = document.getElementById('topbarActions');
+  actions.innerHTML = '';
+
+  if (section === 'clientes') {
+    actions.innerHTML = `<button class="btn btn-primary" onclick="openModalCliente()">＋ Novo cliente</button>`;
+    loadClientes();
+  } else if (section === 'profissionais') {
+    actions.innerHTML = `<button class="btn btn-primary" onclick="openModalProfissional()">＋ Novo profissional</button>`;
+    loadProfissionais();
+  } else if (section === 'servicos') {
+    actions.innerHTML = `<button class="btn btn-primary" onclick="openModalServico()">＋ Novo serviço</button>`;
+    loadServicos();
+  } else if (section === 'agendamentos') {
+    actions.innerHTML = `<button class="btn btn-primary" onclick="openModalAgendamento()">＋ Novo agendamento</button>`;
+    loadAgendamentos();
+  } else if (section === 'comissoes') {
+    loadComissoesSection();
+  } else if (section === 'dashboard') {
+    loadDashboard();
+  }
+
+  currentSection = section;
+}
+
+// ─── API HELPERS ──────────────────────────────────────────
+async function apiFetch(path, options = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || err.mensagem || 'Erro na requisição');
+  }
+  return res.json();
+}
+
+// ─── TOAST ────────────────────────────────────────────────
+function toast(msg, type = '') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+// ─── MODAL ────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── DASHBOARD ────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [ags, cls, pros, svs] = await Promise.all([
+      apiFetch('/agendamentos'),
+      apiFetch('/clientes'),
+      apiFetch('/profissionais'),
+      apiFetch('/servicos'),
+    ]);
+    document.getElementById('stat-agendamentos').textContent = ags.length;
+    document.getElementById('stat-clientes').textContent = cls.length;
+    document.getElementById('stat-profissionais').textContent = pros.filter(p => p.ativo).length;
+    document.getElementById('stat-servicos').textContent = svs.length;
+    renderAgendamentosTable('dashboard-agendamentos', ags.slice(0, 5), true);
+  } catch (e) {
+    document.getElementById('dashboard-agendamentos').innerHTML = `<div class="empty-state"><div class="empty-icon">⚡</div><p>Não foi possível conectar à API.<br><small>Verifique se o servidor está rodando em localhost:3000</small></p></div>`;
+  }
+}
+
+// ─── AGENDAMENTOS ─────────────────────────────────────────
+async function loadAgendamentos() {
+  document.getElementById('lista-agendamentos').innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const data = await apiFetch('/agendamentos');
+    renderAgendamentosTable('lista-agendamentos', data, false);
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function renderAgendamentosTable(containerId, data, mini) {
+  const el = document.getElementById(containerId);
+  if (!data.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">◷</div><p>Nenhum agendamento encontrado.</p></div>`;
+    return;
+  }
+  const badgeClass = s => ({ Pendente: 'badge-pendente', Confirmado: 'badge-confirmado', 'Concluido e pago': 'badge-concluido', Cancelado: 'badge-cancelado' }[s] || '');
+  const rows = data.map(a => `
+    <tr>
+      <td>${a.id}</td>
+      <td>${a.cliente_nome || '—'}</td>
+      <td>${a.profissional_nome || '—'}</td>
+      <td>${a.servico_nome || '—'}</td>
+      <td class="td-muted">${formatDatetime(a.data_hora_inicio)}</td>
+      <td><span class="badge ${badgeClass(a.status)}">${a.status}</span></td>
+      <td>R$ ${Number(a.valor_final || 0).toFixed(2)}</td>
+      ${!mini ? `<td>
+        <button class="btn btn-sm" onclick="openModalStatus(${a.id}, '${a.status}')">Status</button>
+        <button class="btn btn-sm btn-danger" onclick="deletarAgendamento(${a.id})">Remover</button>
+      </td>` : '<td></td>'}
+    </tr>`).join('');
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>#</th><th>Cliente</th><th>Profissional</th><th>Serviço</th><th>Início</th><th>Status</th><th>Valor</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+async function openModalAgendamento() {
+  const [cls, pros, svs] = await Promise.all([
+    apiFetch('/clientes'), apiFetch('/profissionais'), apiFetch('/servicos')
+  ]);
+  document.getElementById('ag-cliente').innerHTML = cls.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+  document.getElementById('ag-profissional').innerHTML = pros.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+  document.getElementById('ag-servico').innerHTML = svs.map(s => `<option value="${s.id}">${s.nome} — R$ ${Number(s.preco_base).toFixed(2)}</option>`).join('');
+  openModal('modal-agendamento');
+}
+
+async function salvarAgendamento() {
+  const body = {
+    cliente_id: +document.getElementById('ag-cliente').value,
+    profissional_id: +document.getElementById('ag-profissional').value,
+    servico_id: +document.getElementById('ag-servico').value,
+    data_hora_inicio: document.getElementById('ag-inicio').value,
+    data_hora_fim: document.getElementById('ag-fim').value,
+    valor_final: +document.getElementById('ag-valor').value || 0,
+    observacoes: document.getElementById('ag-obs').value,
+  };
+  try {
+    await apiFetch('/agendamentos', { method: 'POST', body: JSON.stringify(body) });
+    toast('Agendamento criado com sucesso!', 'success');
+    closeModal('modal-agendamento');
+    loadAgendamentos();
+    loadDashboard();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModalStatus(id, statusAtual) {
+  document.getElementById('status-id').value = id;
+  document.getElementById('status-valor').value = statusAtual;
+  openModal('modal-status');
+}
+
+async function atualizarStatus() {
+  const id = document.getElementById('status-id').value;
+  const status = document.getElementById('status-valor').value;
+  try {
+    await apiFetch(`/agendamentos/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    toast('Status atualizado!', 'success');
+    closeModal('modal-status');
+    loadAgendamentos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deletarAgendamento(id) {
+  if (!confirm('Remover este agendamento?')) return;
+  try {
+    await apiFetch(`/agendamentos/${id}`, { method: 'DELETE' });
+    toast('Agendamento removido.', 'success');
+    loadAgendamentos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ─── CLIENTES ─────────────────────────────────────────────
+async function loadClientes() {
+  document.getElementById('lista-clientes').innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const data = await apiFetch('/clientes');
+    if (!data.length) {
+      document.getElementById('lista-clientes').innerHTML = `<div class="empty-state"><div class="empty-icon">◯</div><p>Nenhum cliente cadastrado.</p></div>`;
+      return;
+    }
+    document.getElementById('lista-clientes').innerHTML = `<table>
+      <thead><tr><th>#</th><th>Nome</th><th>Telefone</th><th>Observações</th><th></th></tr></thead>
+      <tbody>${data.map(c => `<tr>
+        <td class="td-muted">${c.id}</td>
+        <td>${c.nome}</td>
+        <td class="td-muted">${c.telefone}</td>
+        <td class="td-muted">${c.observacoes_alergias || '—'}</td>
+        <td>
+          <button class="btn btn-sm" onclick="openModalCliente(${c.id}, '${esc(c.nome)}', '${esc(c.telefone)}', '${esc(c.observacoes_alergias || '')}')">Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="deletarCliente(${c.id})">Remover</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModalCliente(id, nome, tel, obs) {
+  document.getElementById('cliente-id').value = id || '';
+  document.getElementById('cliente-nome').value = nome || '';
+  document.getElementById('cliente-telefone').value = tel || '';
+  document.getElementById('cliente-obs').value = obs || '';
+  document.getElementById('modal-cliente-title').textContent = id ? 'Editar Cliente' : 'Novo Cliente';
+  openModal('modal-cliente');
+}
+
+async function salvarCliente() {
+  const id = document.getElementById('cliente-id').value;
+  const body = {
+    nome: document.getElementById('cliente-nome').value,
+    telefone: document.getElementById('cliente-telefone').value,
+    observacoes_alergias: document.getElementById('cliente-obs').value,
+  };
+  try {
+    if (id) {
+      await apiFetch(`/clientes/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Cliente atualizado!', 'success');
+    } else {
+      await apiFetch('/clientes', { method: 'POST', body: JSON.stringify(body) });
+      toast('Cliente cadastrado!', 'success');
+    }
+    closeModal('modal-cliente');
+    loadClientes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deletarCliente(id) {
+  if (!confirm('Remover este cliente?')) return;
+  try {
+    await apiFetch(`/clientes/${id}`, { method: 'DELETE' });
+    toast('Cliente removido.', 'success');
+    loadClientes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ─── PROFISSIONAIS ────────────────────────────────────────
+async function loadProfissionais() {
+  document.getElementById('lista-profissionais').innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const data = await apiFetch('/profissionais');
+    if (!data.length) {
+      document.getElementById('lista-profissionais').innerHTML = `<div class="empty-state"><div class="empty-icon">◈</div><p>Nenhum profissional cadastrado.</p></div>`;
+      return;
+    }
+    document.getElementById('lista-profissionais').innerHTML = `<table>
+      <thead><tr><th>#</th><th>Nome</th><th>Especialidade</th><th>Comissão</th><th>Status</th><th></th></tr></thead>
+      <tbody>${data.map(p => `<tr>
+        <td class="td-muted">${p.id}</td>
+        <td>${p.nome}</td>
+        <td class="td-muted">${p.especialidade || '—'}</td>
+        <td class="td-muted">${p.percentual_comissao}%</td>
+        <td><span class="dot ${p.ativo ? 'dot-active' : 'dot-inactive'}"></span>${p.ativo ? 'Ativo' : 'Inativo'}</td>
+        <td>
+          <button class="btn btn-sm" onclick="openModalProfissional(${p.id},'${esc(p.nome)}','${esc(p.telefone||'')}','${esc(p.especialidade||'')}',${p.percentual_comissao},${p.ativo})">Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="deletarProfissional(${p.id})">Remover</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModalProfissional(id, nome, tel, esp, comissao, ativo) {
+  document.getElementById('profissional-id').value = id || '';
+  document.getElementById('profissional-nome').value = nome || '';
+  document.getElementById('profissional-telefone').value = tel || '';
+  document.getElementById('profissional-especialidade').value = esp || '';
+  document.getElementById('profissional-comissao').value = comissao ?? '';
+  document.getElementById('profissional-ativo').value = ativo ?? 1;
+  document.getElementById('modal-profissional-title').textContent = id ? 'Editar Profissional' : 'Novo Profissional';
+  openModal('modal-profissional');
+}
+
+async function salvarProfissional() {
+  const id = document.getElementById('profissional-id').value;
+  const body = {
+    nome: document.getElementById('profissional-nome').value,
+    telefone: document.getElementById('profissional-telefone').value,
+    especialidade: document.getElementById('profissional-especialidade').value,
+    percentual_comissao: +document.getElementById('profissional-comissao').value || 0,
+    ativo: +document.getElementById('profissional-ativo').value,
+  };
+  try {
+    if (id) {
+      await apiFetch(`/profissionais/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Profissional atualizado!', 'success');
+    } else {
+      await apiFetch('/profissionais', { method: 'POST', body: JSON.stringify(body) });
+      toast('Profissional cadastrado!', 'success');
+    }
+    closeModal('modal-profissional');
+    loadProfissionais();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deletarProfissional(id) {
+  if (!confirm('Remover este profissional?')) return;
+  try {
+    await apiFetch(`/profissionais/${id}`, { method: 'DELETE' });
+    toast('Profissional removido.', 'success');
+    loadProfissionais();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ─── SERVIÇOS ─────────────────────────────────────────────
+async function loadServicos() {
+  document.getElementById('lista-servicos').innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const data = await apiFetch('/servicos');
+    if (!data.length) {
+      document.getElementById('lista-servicos').innerHTML = `<div class="empty-state"><div class="empty-icon">◇</div><p>Nenhum serviço cadastrado.</p></div>`;
+      return;
+    }
+    document.getElementById('lista-servicos').innerHTML = `<table>
+      <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Preço</th><th>Duração</th><th></th></tr></thead>
+      <tbody>${data.map(s => `<tr>
+        <td class="td-muted">${s.id}</td>
+        <td>${s.nome}</td>
+        <td class="td-muted">${s.descricao || '—'}</td>
+        <td>R$ ${Number(s.preco_base).toFixed(2)}</td>
+        <td class="td-muted">${s.duracao_minutos} min</td>
+        <td>
+          <button class="btn btn-sm" onclick="openModalServico(${s.id},'${esc(s.nome)}','${esc(s.descricao||'')}',${s.preco_base},${s.duracao_minutos})">Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="deletarServico(${s.id})">Remover</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModalServico(id, nome, desc, preco, dur) {
+  document.getElementById('servico-id').value = id || '';
+  document.getElementById('servico-nome').value = nome || '';
+  document.getElementById('servico-descricao').value = desc || '';
+  document.getElementById('servico-preco').value = preco ?? '';
+  document.getElementById('servico-duracao').value = dur ?? '';
+  document.getElementById('modal-servico-title').textContent = id ? 'Editar Serviço' : 'Novo Serviço';
+  openModal('modal-servico');
+}
+
+async function salvarServico() {
+  const id = document.getElementById('servico-id').value;
+  const body = {
+    nome: document.getElementById('servico-nome').value,
+    descricao: document.getElementById('servico-descricao').value,
+    preco_base: +document.getElementById('servico-preco').value,
+    duracao_minutos: +document.getElementById('servico-duracao').value,
+  };
+  try {
+    if (id) {
+      await apiFetch(`/servicos/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Serviço atualizado!', 'success');
+    } else {
+      await apiFetch('/servicos', { method: 'POST', body: JSON.stringify(body) });
+      toast('Serviço cadastrado!', 'success');
+    }
+    closeModal('modal-servico');
+    loadServicos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deletarServico(id) {
+  if (!confirm('Remover este serviço?')) return;
+  try {
+    await apiFetch(`/servicos/${id}`, { method: 'DELETE' });
+    toast('Serviço removido.', 'success');
+    loadServicos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ─── COMISSÕES ──────────────────────────────────────────────
+let currentComissaoValue = 0;
+
+async function loadComissoesSection() {
+  document.getElementById('resultado-comissoes').style.display = 'none';
+  try {
+    const pros = await apiFetch('/profissionais');
+    document.getElementById('comissao-profissional').innerHTML = '<option value="">Selecione...</option>' + 
+      pros.filter(p => p.ativo).map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    // Set default date to today
+    document.getElementById('comissao-data').value = new Date().toISOString().split('T')[0];
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function calcularComissoes() {
+  const id_profissional = document.getElementById('comissao-profissional').value;
+  const data_fechamento = document.getElementById('comissao-data').value;
+  
+  if (!id_profissional || !data_fechamento) {
+    return toast('Selecione um profissional e a data.', 'error');
+  }
+
+  try {
+    const data = await apiFetch(`/comissoes/calcular?id_profissional=${id_profissional}&data_fechamento=${data_fechamento}`);
+    currentComissaoValue = data.valor_total;
+    
+    document.getElementById('comissoes-total-display').textContent = `R$ ${Number(data.valor_total).toFixed(2)}`;
+    
+    const container = document.getElementById('lista-comissoes');
+    if (data.servicos.length === 0) {
+      container.innerHTML = `<div class="empty-state"><p>Nenhum serviço pendente para este período.</p></div>`;
+      document.getElementById('btn-pagar-comissoes').disabled = true;
+    } else {
+      document.getElementById('btn-pagar-comissoes').disabled = false;
+      const rows = data.servicos.map(s => `
+        <tr>
+          <td>${formatDatetime(s.data_hora)}</td>
+          <td>${s.servico_nome}</td>
+          <td>R$ ${Number(s.valor_servico).toFixed(2)}</td>
+          <td style="color:#2e7d32; font-weight:600;">R$ ${Number(s.valor_comissao).toFixed(2)}</td>
+        </tr>
+      `).join('');
+      container.innerHTML = `<table>
+        <thead><tr><th>Data/Hora</th><th>Serviço</th><th>Valor Pago</th><th>Sua Comissão</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+    document.getElementById('resultado-comissoes').style.display = 'block';
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function registrarPagamento() {
+  const id_profissional = document.getElementById('comissao-profissional').value;
+  const data_fechamento = document.getElementById('comissao-data').value;
+  
+  if (!confirm('Deseja realmente registrar este pagamento? Os agendamentos serão marcados como pagos.')) return;
+
+  try {
+    const body = { id_profissional, data_fechamento, valor_total: currentComissaoValue };
+    await apiFetch('/comissoes/pagar', { method: 'POST', body: JSON.stringify(body) });
+    toast('Pagamento registrado com sucesso!', 'success');
+    
+    // Clear and recalculate to show empty
+    calcularComissoes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ─── UTILS ────────────────────────────────────────────────
+function formatDatetime(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  return isNaN(d) ? str : d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function esc(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+// Fechar modais clicando fora
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Init
+loadDashboard();
+function esc(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+// Fechar modais clicando fora
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>
