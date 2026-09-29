@@ -137,6 +137,10 @@
             <label class="form-label">Data de Fechamento</label>
             <input class="form-input" type="date" id="comissao-data">
           </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">Porcentagem (%)</label>
+            <input class="form-input" type="number" id="comissao-porcentagem" placeholder="Ex: 50">
+          </div>
           <div class="form-group" style="display: flex; align-items: flex-end;">
             <button class="btn btn-primary" onclick="calcularComissoes()">Calcular Fechamento</button>
           </div>
@@ -739,13 +743,17 @@ async function loadComissoesSection() {
 async function calcularComissoes() {
   const id_profissional = document.getElementById('comissao-profissional').value;
   const data_fechamento = document.getElementById('comissao-data').value;
+  const porcentagem = document.getElementById('comissao-porcentagem').value;
   
   if (!id_profissional || !data_fechamento) {
     return toast('Selecione um profissional e a data.', 'error');
   }
 
   try {
-    const data = await apiFetch(`/comissoes/calcular?id_profissional=${id_profissional}&data_fechamento=${data_fechamento}`);
+    const queryParams = new URLSearchParams({ id_profissional, data_fechamento });
+    if (porcentagem) queryParams.append('porcentagem', porcentagem);
+    
+    const data = await apiFetch(`/comissoes/calcular?${queryParams.toString()}`);
     currentComissaoValue = data.valor_total;
     
     document.getElementById('comissoes-total-display').textContent = `R$ ${Number(data.valor_total).toFixed(2)}`;
@@ -776,11 +784,14 @@ async function calcularComissoes() {
 async function registrarPagamento() {
   const id_profissional = document.getElementById('comissao-profissional').value;
   const data_fechamento = document.getElementById('comissao-data').value;
+  const porcentagem = document.getElementById('comissao-porcentagem').value;
   
   if (!confirm('Deseja realmente registrar este pagamento? Os agendamentos serão marcados como pagos.')) return;
 
   try {
     const body = { id_profissional, data_fechamento, valor_total: currentComissaoValue };
+    if (porcentagem) body.porcentagem_aplicada = Number(porcentagem);
+    
     await apiFetch('/comissoes/pagar', { method: 'POST', body: JSON.stringify(body) });
     toast('Pagamento registrado com sucesso!', 'success');
     

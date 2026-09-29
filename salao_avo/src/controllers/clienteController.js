@@ -1,4 +1,5 @@
 const clienteService = require('../services/clienteService');
+const whatsappService = require('../services/whatsappService');
 
 class ClienteController {
     async listarTodos(req, res) {
@@ -15,10 +16,20 @@ class ClienteController {
         try {
             const dadosCliente = req.body; 
             const novoId = await clienteService.criar(dadosCliente); 
-            return res.status(201).json({ 
+            
+            res.status(201).json({ 
                 id: novoId, 
                 mensagem: 'Cliente cadastrado com sucesso no salão!' 
             });
+
+            // Agendar boas-vindas via WhatsApp (best-effort, não bloqueia o cadastro)
+            try {
+                whatsappService.agendarBoasVindas(dadosCliente.telefone, dadosCliente.nome);
+            } catch (e) {
+                console.log('WhatsApp: erro ao agendar boas-vindas:', e.message);
+            }
+            
+            return;
         } catch (erro) {
             console.error('Erro ao criar cliente:', erro);
             if (erro.message.includes("obrigatórios")) {

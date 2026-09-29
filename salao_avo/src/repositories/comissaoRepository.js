@@ -16,12 +16,12 @@ class ComissaoRepository {
         `, [id_profissional, data_fechamento]);
     }
 
-    async registrarPagamento(id_profissional, valor_total, data_fechamento) {
+    async registrarPagamento(id_profissional, valor_total, data_fechamento, porcentagem_aplicada) {
         const db = await getDb();
         const resultado = await db.run(`
-            INSERT INTO pagamentos_comissao (id_profissional, valor_total, periodo_fim)
-            VALUES (?, ?, ?)
-        `, [id_profissional, valor_total, data_fechamento]);
+            INSERT INTO pagamentos_comissao (id_profissional, valor_total, periodo_fim, porcentagem_aplicada)
+            VALUES (?, ?, ?, ?)
+        `, [id_profissional, valor_total, data_fechamento, porcentagem_aplicada]);
         return resultado.lastID;
     }
 

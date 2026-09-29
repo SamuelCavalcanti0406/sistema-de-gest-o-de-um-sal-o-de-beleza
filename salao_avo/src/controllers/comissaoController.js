@@ -3,7 +3,7 @@ const comissaoRepository = require('../repositories/comissaoRepository');
 class ComissaoController {
     async calcular(req, res) {
         try {
-            const { id_profissional, data_fechamento } = req.query;
+            const { id_profissional, data_fechamento, porcentagem } = req.query;
             if (!id_profissional || !data_fechamento) {
                 return res.status(400).json({ error: 'id_profissional e data_fechamento são obrigatórios.' });
             }
@@ -12,7 +12,7 @@ class ComissaoController {
             
             let valor_total_devido = 0;
             const servicos_realizados = agendamentos.map(agendamento => {
-                const percentual = agendamento.percentual_comissao || 0;
+                const percentual = porcentagem !== undefined ? parseFloat(porcentagem) : (agendamento.percentual_comissao || 0);
                 const valor_comissao = (agendamento.valor_final * percentual) / 100;
                 valor_total_devido += valor_comissao;
                 
@@ -37,7 +37,7 @@ class ComissaoController {
 
     async pagar(req, res) {
         try {
-            const { id_profissional, valor_total, data_fechamento } = req.body;
+            const { id_profissional, valor_total, data_fechamento, porcentagem_aplicada } = req.body;
             if (!id_profissional || valor_total === undefined || !data_fechamento) {
                 return res.status(400).json({ error: 'id_profissional, valor_total e data_fechamento são obrigatórios.' });
             }
@@ -48,7 +48,7 @@ class ComissaoController {
                 return res.status(400).json({ error: 'Nenhum agendamento pendente encontrado para este período.' });
             }
 
-            const id_pagamento = await comissaoRepository.registrarPagamento(id_profissional, valor_total, data_fechamento);
+            const id_pagamento = await comissaoRepository.registrarPagamento(id_profissional, valor_total, data_fechamento, porcentagem_aplicada);
             await comissaoRepository.marcarAgendamentosComoPagos(id_profissional, data_fechamento, id_pagamento);
 
             res.status(201).json({ 

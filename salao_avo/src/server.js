@@ -26,6 +26,11 @@ app.use('/api/agendamentos', agendamentoRoutes);
 app.use('/api/dashboard', dashboardRoutes); 
 app.use('/api/comissoes', comissaoRoutes);
 
+const fechamentoMensal = require('./jobs/fechamentoMensal');
+fechamentoMensal.iniciarJob();
+
+const whatsappService = require('./services/whatsappService');
+whatsappService.inicializar();
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
