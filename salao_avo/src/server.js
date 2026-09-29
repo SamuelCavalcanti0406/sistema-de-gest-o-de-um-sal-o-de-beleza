@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const crypto = require('crypto');
+const cors = require('cors');
 const port = process.env.PORT || 3000;
 const clienteRoutes = require('./routes/clienteRoutes');
 const servicoRoutes = require('./routes/servicoRoutes');
@@ -14,6 +15,11 @@ require('dotenv').config();
 
 //Habilita a porra do Express para entender requisições com corpo em JSON Essencial para POST e PUT
 app.use(express.json());
+app.use('/api', cors({
+    origin: /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 app.get('/ping', (req, res) => {
     res.json({ mensagem: 'API do Salão operando perfeitamente!' });
