@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Salão — Painel Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/admin/style.css">
 </head>
 <body>
 
@@ -346,7 +346,9 @@
 </div>
 
 <script>
-const API = 'http://localhost:3000/api';
+const API = `${window.location.origin}/api`;
+let adminApiKey = sessionStorage.getItem('adminApiKey');
+let adminApiKeyPrompt;
 let currentSection = 'dashboard';
 
 // ─── NAVIGATION ───────────────────────────────────────────
@@ -393,10 +395,30 @@ function navigate(section) {
 
 // ─── API HELPERS ──────────────────────────────────────────
 async function apiFetch(path, options = {}) {
-  const res = await fetch(API + path, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
-  });
+  if (!adminApiKey) {
+    if (!adminApiKeyPrompt) {
+      adminApiKeyPrompt = Promise.resolve().then(() => {
+        const enteredKey = window.prompt('Informe a chave de acesso administrativo:');
+        if (enteredKey) {
+          adminApiKey = enteredKey.trim();
+          sessionStorage.setItem('adminApiKey', adminApiKey);
+        }
+        return adminApiKey;
+      });
+    }
+    await adminApiKeyPrompt;
+    adminApiKeyPrompt = null;
+  }
+  if (!adminApiKey) throw new Error('Acesso cancelado. Recarregue o painel para tentar novamente.');
+
+  const headers = new Headers(options.headers || {});
+  headers.set('Content-Type', 'application/json');
+  headers.set('Authorization', `Bearer ${adminApiKey}`);
+  const res = await fetch(API + path, { ...options, headers });
+  if (res.status === 401) {
+    adminApiKey = '';
+    sessionStorage.removeItem('adminApiKey');
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || err.mensagem || 'Erro na requisição');
