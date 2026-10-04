@@ -1,27 +1,35 @@
 /* ============================================================
-   Salão da Vó — style.css
-   Mobile-First · Performance · Acessibilidade
+   Rosário Cabeleireiros & Cia — style.css
+   Paleta alinhada ao painel administrativo
    ============================================================ */
 
-/* ---------- Variáveis e Reset ---------- */
 :root {
-  --cor-primaria: #9d4edd;
-  --cor-primaria-escura: #7b2cbf;
-  --cor-primaria-clara: #e0aaff;
+  --cream: #f9f6f1;
+  --warm-white: #fdfcfa;
+  --sand: #e8e0d5;
+  --taupe: #c4b8a8;
+  --mocha: #8b7355;
+  --espresso: #0b353f;
+  --ink: #2c2420;
+  --gold: #b8956a;
+  --blush: #d4a59a;
+  --cor-primaria: #8b7355;
+  --cor-primaria-escura: #0b353f;
+  --cor-primaria-clara: #e8e0d5;
   --cor-whatsapp: #25d366;
   --cor-whatsapp-escuro: #1da851;
-  --cor-destaque: #ff9e00;
-  --cor-fundo: #fff9fb;
-  --cor-fundo-alt: #f6e9f7;
-  --cor-texto: #3d2b3d;
-  --cor-texto-claro: #6b5a6b;
+  --cor-destaque: #b8956a;
+  --cor-fundo: #f9f6f1;
+  --cor-fundo-alt: #fdfcfa;
+  --cor-texto: #2c2420;
+  --cor-texto-claro: #8b7355;
   --cor-branco: #ffffff;
-  --sombra-card: 0 4px 20px rgba(123, 44, 191, 0.10);
-  --sombha-hover: 0 10px 30px rgba(123, 44, 191, 0.18);
-  --raio: 16px;
+  --sombra-card: 0 1px 3px rgba(44, 36, 32, 0.08), 0 4px 16px rgba(44, 36, 32, 0.05);
+  --sombha-hover: 0 8px 24px rgba(11, 53, 63, 0.12);
+  --raio: 8px;
   --transicao: 0.25s ease;
-  --fonte-titulo: "Playfair Display", Georgia, serif;
-  --fonte-texto: "Inter", system-ui, -apple-system, sans-serif;
+  --fonte-titulo: "Cormorant Garamond", Georgia, serif;
+  --fonte-texto: "DM Sans", system-ui, -apple-system, sans-serif;
 }
 
 *,
@@ -156,9 +164,9 @@ summary:focus-visible {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 249, 251, 0.92);
+  background: rgba(253, 252, 250, 0.94);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(123, 44, 191, 0.08);
+  border-bottom: 1px solid var(--sand);
 }
 
 .nav {
@@ -170,12 +178,24 @@ summary:focus-visible {
 
 .nav__logo {
   font-family: var(--fonte-titulo);
-  font-size: 1.35rem;
-  font-weight: 700;
   color: var(--cor-primaria-escura);
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.nav__logo-marca {
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.nav__logo-sub {
+  font-family: var(--fonte-texto);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mocha);
 }
 
 .nav__toggle {
@@ -239,14 +259,14 @@ summary:focus-visible {
 }
 
 .nav__cta {
-  background: var(--cor-primaria);
-  color: var(--cor-branco) !important;
+  background: var(--espresso);
+  color: var(--cream) !important;
   text-align: center;
   margin-top: 0.5rem;
 }
 
 .nav__cta:hover {
-  background: var(--cor-primaria-escura) !important;
+  background: #082830 !important;
 }
 
 @media (min-width: 768px) {
@@ -280,9 +300,9 @@ summary:focus-visible {
 .hero {
   padding: 4.5rem 0 3.5rem;
   background:
-    radial-gradient(circle at 85% 15%, rgba(224, 170, 255, 0.35), transparent 45%),
-    radial-gradient(circle at 10% 85%, rgba(255, 158, 0, 0.15), transparent 40%),
-    linear-gradient(160deg, #fff9fb 0%, #f6e9f7 100%);
+    radial-gradient(circle at 85% 15%, rgba(184, 149, 106, 0.22), transparent 45%),
+    radial-gradient(circle at 10% 85%, rgba(11, 53, 63, 0.08), transparent 40%),
+    linear-gradient(160deg, var(--cream) 0%, var(--sand) 100%);
   text-align: center;
 }
 
@@ -446,8 +466,8 @@ summary:focus-visible {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--cor-primaria);
-  color: var(--cor-branco);
+  background: var(--espresso);
+  color: var(--cream);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -563,7 +583,8 @@ summary:focus-visible {
 
   .form__grupo:nth-child(3),
   .form__submit,
-  .form__aviso {
+  .form__aviso,
+  .form__status {
     grid-column: 1 / -1;
   }
 }
@@ -606,10 +627,48 @@ summary:focus-visible {
   border-color: #e63946;
 }
 
+.form__consentimento {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  grid-column: 1 / -1;
+  color: var(--cor-texto-claro);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.form__consentimento input {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  margin: 0.15rem 0 0;
+  accent-color: var(--cor-primaria);
+}
+
+.form__consentimento.erro {
+  color: #c0614a;
+}
+
 .form__aviso {
   text-align: center;
   font-size: 0.82rem;
   color: var(--cor-texto-claro);
+}
+
+.form__status {
+  text-align: center;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+  grid-column: 1 / -1;
+}
+
+.form__status--erro {
+  color: #c0614a;
+}
+
+.form__status--ok {
+  color: #5a7a5e;
 }
 
 /* ---------- Contato / Mapa ---------- */
