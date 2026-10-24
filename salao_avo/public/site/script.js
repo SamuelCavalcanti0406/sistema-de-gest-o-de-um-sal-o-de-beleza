@@ -69,21 +69,47 @@
   var toggle = document.getElementById("navToggle");
   var menu = document.getElementById("navMenu");
 
+  function definirMenu(aberto) {
+    toggle.setAttribute("aria-expanded", String(aberto));
+    toggle.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
+    menu.classList.toggle("nav__menu--aberto", aberto);
+  }
+
+  function menuAberto() {
+    return toggle.getAttribute("aria-expanded") === "true";
+  }
+
   if (toggle && menu) {
     toggle.addEventListener("click", function () {
-      var aberto = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", String(!aberto));
-      toggle.setAttribute("aria-label", aberto ? "Abrir menu" : "Fechar menu");
-      menu.classList.toggle("nav__menu--aberto", !aberto);
+      definirMenu(!menuAberto());
     });
 
     menu.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () {
-        toggle.setAttribute("aria-expanded", "false");
-        toggle.setAttribute("aria-label", "Abrir menu");
-        menu.classList.remove("nav__menu--aberto");
+        definirMenu(false);
       });
     });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && menuAberto()) {
+        definirMenu(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener("click", function (e) {
+      if (menuAberto() && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        definirMenu(false);
+      }
+    });
+
+    // Ao girar o tablet para paisagem o menu vira barra: limpa o estado aberto.
+    var desktop = window.matchMedia("(min-width: 960px)");
+    var aoMudarLargura = function (mq) {
+      if (mq.matches) definirMenu(false);
+    };
+    if (desktop.addEventListener) desktop.addEventListener("change", aoMudarLargura);
+    else if (desktop.addListener) desktop.addListener(aoMudarLargura);
   }
 
   var campoData = document.getElementById("data");
@@ -117,41 +143,35 @@
       var campos = [nome, telefone, servico, data];
       var valido = true;
 
+      function marcarErro(campo, comErro) {
+        if (!campo) return;
+        campo.classList.toggle("erro", comErro);
+        if (comErro) campo.setAttribute("aria-invalid", "true");
+        else campo.removeAttribute("aria-invalid");
+        if (comErro) valido = false;
+      }
+
       campos.forEach(function (c) {
-        if (c) c.classList.remove("erro");
+        marcarErro(c, false);
       });
       setStatus("");
 
-      if (!nome.value.trim()) {
-        nome.classList.add("erro");
-        valido = false;
-      }
-
-      if (soDigitos(telefone.value).length < 10) {
-        telefone.classList.add("erro");
-        valido = false;
-      }
-
-      if (!servico.value) {
-        servico.classList.add("erro");
-        valido = false;
-      }
-
-      if (!data.value) {
-        data.classList.add("erro");
-        valido = false;
-      }
+      marcarErro(nome, !nome.value.trim());
+      marcarErro(telefone, soDigitos(telefone.value).length < 10);
+      marcarErro(servico, !servico.value);
+      marcarErro(data, !data.value);
 
       var grupoConsentimento = consentimento && consentimento.closest(".form__consentimento");
-      if (!consentimento || !consentimento.checked) {
-        if (grupoConsentimento) grupoConsentimento.classList.add("erro");
-        valido = false;
-      } else if (grupoConsentimento) {
-        grupoConsentimento.classList.remove("erro");
+      var semConsentimento = !consentimento || !consentimento.checked;
+      if (grupoConsentimento) grupoConsentimento.classList.toggle("erro", semConsentimento);
+      if (consentimento) {
+        if (semConsentimento) consentimento.setAttribute("aria-invalid", "true");
+        else consentimento.removeAttribute("aria-invalid");
       }
+      if (semConsentimento) valido = false;
 
       if (!valido) {
-        var primeiro = form.querySelector(".erro");
+        var primeiro = form.querySelector("[aria-invalid='true']");
         if (primeiro) primeiro.focus();
         setStatus("Preencha os campos e autorize a mensagem de boas-vindas pelo WhatsApp.", "erro");
         return;

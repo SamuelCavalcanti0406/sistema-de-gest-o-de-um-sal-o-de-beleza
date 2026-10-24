@@ -1,6 +1,8 @@
 /* ============================================================
    Rosário Cabeleireiros & Cia — style.css
    Paleta alinhada ao painel administrativo
+   Mobile-first: estilos base valem para 320px+, media queries
+   só acrescentam layout para telas maiores.
    ============================================================ */
 
 :root {
@@ -16,20 +18,34 @@
   --cor-primaria: #8b7355;
   --cor-primaria-escura: #0b353f;
   --cor-primaria-clara: #e8e0d5;
-  --cor-whatsapp: #25d366;
-  --cor-whatsapp-escuro: #1da851;
+  /* Verde do WhatsApp escurecido para texto branco passar AA (4,77:1) */
+  --cor-whatsapp: #13843f;
+  --cor-whatsapp-escuro: #0f6e34;
+  --cor-whatsapp-marca: #25d366;
   --cor-destaque: #b8956a;
+  /* Dourado para texto (preços, estrelas): 4,8:1 sobre branco */
+  --cor-destaque-texto: #8a6d45;
   --cor-fundo: #f9f6f1;
   --cor-fundo-alt: #fdfcfa;
   --cor-texto: #2c2420;
-  --cor-texto-claro: #8b7355;
+  /* Texto secundário: ≥4,5:1 sobre cream, sand e branco */
+  --cor-texto-claro: #75604a;
+  --cor-borda-campo: #9c8a74;
+  --cor-erro: #a8452f;
+  --cor-ok: #4f6d53;
   --cor-branco: #ffffff;
   --sombra-card: 0 1px 3px rgba(44, 36, 32, 0.08), 0 4px 16px rgba(44, 36, 32, 0.05);
-  --sombha-hover: 0 8px 24px rgba(11, 53, 63, 0.12);
+  --sombra-hover: 0 8px 24px rgba(11, 53, 63, 0.12);
   --raio: 8px;
   --transicao: 0.25s ease;
-  --fonte-titulo: "Cormorant Garamond", Georgia, serif;
-  --fonte-texto: "DM Sans", system-ui, -apple-system, sans-serif;
+  --fonte-titulo: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --fonte-texto: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Respiro lateral: nunca menos que a safe area (iPhone deitado, notch) */
+  --gutter: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
+  --altura-header: 4.25rem;
+  --secao-espaco: clamp(3rem, 2rem + 5vw, 6rem);
+  --alvo-toque: 44px; /* Apple HIG */
 }
 
 *,
@@ -42,7 +58,23 @@
 
 html {
   scroll-behavior: smooth;
+  /* Âncoras não ficam escondidas atrás do header fixo */
+  scroll-padding-top: calc(var(--altura-header) + env(safe-area-inset-top) + 0.5rem);
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Telas grandes e 4K: escala tudo que usa rem de forma proporcional */
+@media (min-width: 1920px) {
+  html { font-size: 112.5%; }
+}
+
+@media (min-width: 2560px) {
+  html { font-size: 131.25%; }
+}
+
+@media (min-width: 3840px) {
+  html { font-size: 175%; }
 }
 
 body {
@@ -50,13 +82,28 @@ body {
   color: var(--cor-texto);
   background: var(--cor-fundo);
   line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100svh;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: rgba(11, 53, 63, 0.12);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* clip não cria contêiner de rolagem, então não interfere no header sticky */
+@supports (overflow-x: clip) {
+  body { overflow-x: clip; }
+}
+
+img,
+iframe,
+video {
+  max-width: 100%;
+  display: block;
 }
 
 img {
-  max-width: 100%;
   height: auto;
-  display: block;
 }
 
 a {
@@ -68,18 +115,63 @@ ul {
   list-style: none;
 }
 
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 .container {
-  width: min(100% - 2rem, 72rem);
+  width: min(100% - 2 * var(--gutter), 72rem);
   margin-inline: auto;
 }
 
 .container--estreita {
-  width: min(100% - 2rem, 40rem);
+  width: min(100% - 2 * var(--gutter), 40rem);
+}
+
+/* ---------- Acessibilidade ---------- */
+.pular-link {
+  position: absolute;
+  top: calc(0.5rem + env(safe-area-inset-top));
+  left: var(--gutter);
+  z-index: 300;
+  padding: 0.75rem 1rem;
+  border-radius: var(--raio);
+  background: var(--espresso);
+  color: var(--cream);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.pular-link:focus {
+  transform: none;
+}
+
+.btn:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--espresso);
+  outline-offset: 3px;
 }
 
 /* ---------- Tipografia de seções ---------- */
 .secao {
-  padding: 4rem 0;
+  padding-block: var(--secao-espaco);
 }
 
 .secao--alt {
@@ -88,12 +180,14 @@ ul {
 
 .secao__cabecalho {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: clamp(1.75rem, 1rem + 3vw, 3rem);
 }
 
 .secao__titulo {
   font-family: var(--fonte-titulo);
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem);
+  line-height: 1.15;
   color: var(--cor-primaria-escura);
   margin-bottom: 0.75rem;
 }
@@ -114,22 +208,28 @@ ul {
   border-radius: 999px;
   font-weight: 600;
   font-size: 1rem;
+  line-height: 1.2;
+  text-align: center;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: var(--transicao);
-  min-height: 48px; /* alvo de toque acessível */
+  transition: background-color var(--transicao), color var(--transicao), transform var(--transicao);
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: progress;
 }
 
 .btn--primario {
   background: var(--cor-whatsapp);
   color: var(--cor-branco);
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
-}
-
-.btn--primario:hover,
-.btn--primario:focus-visible {
-  background: var(--cor-whatsapp-escuro);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(19, 132, 63, 0.3);
 }
 
 .btn--secundario {
@@ -138,7 +238,10 @@ ul {
   border-color: var(--cor-primaria);
 }
 
-.btn--secundario:hover,
+.btn--primario:focus-visible {
+  background: var(--cor-whatsapp-escuro);
+}
+
 .btn--secundario:focus-visible {
   background: var(--cor-primaria);
   color: var(--cor-branco);
@@ -149,14 +252,17 @@ ul {
   font-size: 1.05rem;
 }
 
-.btn:focus-visible,
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-summary:focus-visible {
-  outline: 3px solid var(--cor-destaque);
-  outline-offset: 3px;
+/* Hover só em dispositivos com ponteiro: no iPhone o hover "gruda" após o toque */
+@media (hover: hover) {
+  .btn--primario:hover {
+    background: var(--cor-whatsapp-escuro);
+    transform: translateY(-2px);
+  }
+
+  .btn--secundario:hover {
+    background: var(--cor-primaria);
+    color: var(--cor-branco);
+  }
 }
 
 /* ---------- Header / Nav ---------- */
@@ -164,7 +270,9 @@ summary:focus-visible {
   position: sticky;
   top: 0;
   z-index: 100;
+  padding-top: env(safe-area-inset-top);
   background: rgba(253, 252, 250, 0.94);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--sand);
 }
@@ -173,7 +281,9 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: 0.75rem;
+  gap: 0.75rem;
+  min-height: var(--altura-header);
+  padding-block: 0.5rem;
 }
 
 .nav__logo {
@@ -181,13 +291,19 @@ summary:focus-visible {
   color: var(--cor-primaria-escura);
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--alvo-toque);
   line-height: 1.15;
 }
 
 .nav__logo-marca {
-  font-size: 1.45rem;
+  font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.45rem);
   font-weight: 600;
   letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav__logo-sub {
@@ -195,17 +311,24 @@ summary:focus-visible {
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--mocha);
+  color: var(--cor-texto-claro);
 }
 
 .nav__toggle {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
+  flex-shrink: 0;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  margin-right: -0.5rem;
   background: none;
   border: none;
-  padding: 0.5rem;
+  border-radius: var(--raio);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .nav__toggle span {
@@ -236,9 +359,15 @@ summary:focus-visible {
   flex-direction: column;
   background: var(--cor-branco);
   box-shadow: var(--sombra-card);
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 0.75rem var(--gutter) calc(1.25rem + env(safe-area-inset-bottom));
   gap: 0.25rem;
   display: none;
+  /* dvh acompanha a barra do Safari: o menu nunca fica cortado embaixo */
+  max-height: calc(100vh - var(--altura-header) - env(safe-area-inset-top));
+  max-height: calc(100dvh - var(--altura-header) - env(safe-area-inset-top));
+  overflow-y: auto;
+  overscroll-behavior: contain; /* rolar o menu não arrasta a página atrás */
+  -webkit-overflow-scrolling: touch; /* só tem efeito no iOS 12 ou anterior */
 }
 
 .nav__menu--aberto {
@@ -246,30 +375,40 @@ summary:focus-visible {
 }
 
 .nav__menu a {
-  display: block;
-  padding: 0.75rem 0.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem;
   font-weight: 500;
-  border-radius: 8px;
+  border-radius: var(--raio);
   transition: var(--transicao);
 }
 
-.nav__menu a:hover {
-  color: var(--cor-primaria-escura);
-  background: var(--cor-fundo-alt);
+.nav__menu a:active {
+  background: var(--cor-fundo);
 }
 
-.nav__cta {
+.nav__menu .nav__cta {
+  justify-content: center;
   background: var(--espresso);
-  color: var(--cream) !important;
-  text-align: center;
+  color: var(--cream);
   margin-top: 0.5rem;
 }
 
-.nav__cta:hover {
-  background: #082830 !important;
+@media (hover: hover) {
+  .nav__menu a:hover {
+    color: var(--cor-primaria-escura);
+    background: var(--cor-fundo);
+  }
+
+  .nav__menu .nav__cta:hover {
+    background: #082830;
+    color: var(--cream);
+  }
 }
 
-@media (min-width: 768px) {
+/* Menu completo só a partir de 960px: no iPad em pé ele não cabe ao lado do logo */
+@media (min-width: 960px) {
   .nav__toggle {
     display: none;
   }
@@ -279,26 +418,35 @@ summary:focus-visible {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1.5rem;
+    gap: clamp(0.25rem, 1vw, 1rem);
+    max-height: none;
+    overflow: visible;
     background: none;
     box-shadow: none;
     padding: 0;
   }
 
   .nav__menu a {
-    padding: 0.4rem 0.2rem;
+    min-height: var(--alvo-toque);
+    padding: 0.4rem 0.6rem;
   }
 
-  .nav__cta {
+  .nav__menu .nav__cta {
     margin-top: 0;
-    padding: 0.5rem 1.25rem !important;
+    margin-left: 0.5rem;
+    padding-inline: 1.25rem;
     border-radius: 999px;
   }
 }
 
 /* ---------- Hero ---------- */
 .hero {
-  padding: 4.5rem 0 3.5rem;
+  display: flex;
+  align-items: center;
+  /* svh = altura com a barra do Safari visível: o hero não "pula" ao rolar */
+  min-height: min(calc(100vh - var(--altura-header)), 56rem);
+  min-height: min(calc(100svh - var(--altura-header) - env(safe-area-inset-top)), 56rem);
+  padding-block: clamp(3rem, 2rem + 4vw, 5rem);
   background:
     radial-gradient(circle at 85% 15%, rgba(184, 149, 106, 0.22), transparent 45%),
     radial-gradient(circle at 10% 85%, rgba(11, 53, 63, 0.08), transparent 40%),
@@ -320,20 +468,15 @@ summary:focus-visible {
 
 .hero__titulo {
   font-family: var(--fonte-titulo);
-  font-size: clamp(2.1rem, 6vw, 3.5rem);
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: clamp(2.1rem, 1.4rem + 3.6vw, 4rem);
+  line-height: 1.1;
   color: var(--cor-texto);
   margin-bottom: 1rem;
 }
 
-.hero__titulo em {
-  font-style: normal;
-  color: var(--cor-primaria-escura);
-  position: relative;
-}
-
 .hero__subtitulo {
-  font-size: 1.05rem;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
   color: var(--cor-texto-claro);
   max-width: 34rem;
   margin: 0 auto 2rem;
@@ -343,8 +486,9 @@ summary:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  align-items: center;
-  margin-bottom: 2rem;
+  align-items: stretch;
+  width: min(100%, 22rem);
+  margin: 0 auto 2rem;
 }
 
 .hero__provas {
@@ -361,6 +505,14 @@ summary:focus-visible {
   .hero__acoes {
     flex-direction: row;
     justify-content: center;
+    width: auto;
+  }
+}
+
+/* Celular deitado: pouca altura, não força o hero a ocupar a tela toda */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero {
+    min-height: 0;
   }
 }
 
@@ -368,16 +520,16 @@ summary:focus-visible {
 .servicos__grade {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: clamp(1rem, 0.75rem + 1vw, 1.5rem);
 }
 
-@media (min-width: 560px) {
+@media (min-width: 520px) {
   .servicos__grade {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .servicos__grade {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -386,21 +538,27 @@ summary:focus-visible {
 .card {
   background: var(--cor-branco);
   border-radius: var(--raio);
-  padding: 1.75rem 1.5rem;
+  padding: clamp(1.25rem, 1rem + 1vw, 1.75rem) clamp(1.25rem, 1rem + 0.5vw, 1.5rem);
   box-shadow: var(--sombra-card);
-  transition: var(--transicao);
+  transition: transform var(--transicao), box-shadow var(--transicao);
   display: flex;
   flex-direction: column;
 }
 
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--sombha-hover);
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--sombra-hover);
+  }
 }
 
 .card__icone {
   font-size: 2.2rem;
   margin-bottom: 0.75rem;
+}
+
+.card__icone:empty {
+  display: none;
 }
 
 .card__titulo {
@@ -411,7 +569,7 @@ summary:focus-visible {
 }
 
 .card__descricao {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   color: var(--cor-texto-claro);
   flex: 1;
   margin-bottom: 1rem;
@@ -419,16 +577,16 @@ summary:focus-visible {
 
 .card__preco {
   font-family: var(--fonte-titulo);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--cor-destaque);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--cor-destaque-texto);
 }
 
 /* ---------- Depoimentos ---------- */
 .depoimentos__grade {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: clamp(1rem, 0.75rem + 1vw, 1.5rem);
 }
 
 @media (min-width: 820px) {
@@ -438,20 +596,23 @@ summary:focus-visible {
 }
 
 .depoimento {
+  display: flex;
+  flex-direction: column;
   background: var(--cor-branco);
   border-radius: var(--raio);
-  padding: 1.75rem;
+  padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   box-shadow: var(--sombra-card);
 }
 
 .depoimento__estrelas {
-  color: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
   letter-spacing: 3px;
   margin-bottom: 0.75rem;
 }
 
 .depoimento__texto {
-  font-size: 0.95rem;
+  flex: 1;
+  font-size: 1rem;
   color: var(--cor-texto);
   margin-bottom: 1.25rem;
 }
@@ -480,7 +641,7 @@ summary:focus-visible {
 }
 
 .depoimento__local {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--cor-texto-claro);
 }
 
@@ -488,7 +649,7 @@ summary:focus-visible {
 .sobre__conteudo {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
   align-items: center;
 }
 
@@ -504,6 +665,7 @@ summary:focus-visible {
   width: 100%;
   object-fit: cover;
   aspect-ratio: 4 / 3;
+  background: var(--sand);
 }
 
 .sobre__texto .secao__titulo {
@@ -539,6 +701,7 @@ summary:focus-visible {
 
 .faq__item summary {
   cursor: pointer;
+  min-height: 56px;
   padding: 1rem 1.25rem;
   font-weight: 600;
   list-style: none;
@@ -546,11 +709,18 @@ summary:focus-visible {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  touch-action: manipulation;
+}
+
+/* Safari ainda desenha o triângulo padrão por este pseudo-elemento */
+.faq__item summary::-webkit-details-marker {
+  display: none;
 }
 
 .faq__item summary::after {
   content: "+";
   font-size: 1.4rem;
+  line-height: 1;
   color: var(--cor-primaria);
   flex-shrink: 0;
   transition: var(--transicao);
@@ -571,27 +741,28 @@ summary:focus-visible {
   background: var(--cor-branco);
   border-radius: var(--raio);
   box-shadow: var(--sombra-card);
-  padding: 1.75rem;
+  padding: clamp(1.25rem, 0.75rem + 2vw, 2rem);
   display: grid;
   gap: 1.1rem;
 }
 
-@media (min-width: 560px) {
+.form__consentimento,
+.form__submit,
+.form__aviso,
+.form__status {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 640px) {
   .form {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .form__grupo:nth-child(3),
-  .form__submit,
-  .form__aviso,
-  .form__status {
-    grid-column: 1 / -1;
   }
 }
 
 .form__grupo {
   display: grid;
   gap: 0.4rem;
+  min-width: 0;
 }
 
 .form__grupo label {
@@ -601,37 +772,68 @@ summary:focus-visible {
 
 .form__grupo input,
 .form__grupo select {
+  display: block;
   width: 100%;
-  padding: 0.8rem 1rem;
-  border: 1.5px solid #e3d5e8;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--cor-texto);
-  background: var(--cor-fundo);
-  transition: var(--transicao);
+  min-width: 0;
   min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--cor-borda-campo);
+  border-radius: 10px;
+  /* 16px é o mínimo para o iOS não dar zoom ao focar o campo */
+  font-size: max(16px, 1rem);
+  line-height: 1.25;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+  transition: border-color var(--transicao), background-color var(--transicao), box-shadow var(--transicao);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form__grupo input::placeholder {
+  color: #8a7a68;
+  opacity: 1;
+}
+
+/* Seta própria: o select nativo do iOS vem com visual cinza e sem seta */
+.form__grupo select {
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%230b353f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px 8px;
+  text-overflow: ellipsis;
+}
+
+/* iOS centraliza a data e deixa o campo vazio sem altura */
+.form__grupo input[type="date"] {
+  text-align: left;
+}
+
+.form__grupo input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
 }
 
 .form__grupo input:focus,
 .form__grupo select:focus {
-  border-color: var(--cor-primaria);
-  background: var(--cor-branco);
+  border-color: var(--cor-primaria-escura);
+  background-color: var(--cor-branco);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.15);
+  box-shadow: 0 0 0 3px rgba(11, 53, 63, 0.18);
 }
 
-.form__grupo input--erro,
 .form__grupo input.erro,
 .form__grupo select.erro {
-  border-color: #e63946;
+  border-color: var(--cor-erro);
+  box-shadow: 0 0 0 3px rgba(168, 69, 47, 0.15);
 }
 
 .form__consentimento {
   display: flex;
   align-items: flex-start;
-  gap: 0.7rem;
-  grid-column: 1 / -1;
+  gap: 0.75rem;
+  min-height: var(--alvo-toque);
+  padding-block: 0.25rem;
   color: var(--cor-texto-claro);
   font-size: 0.9rem;
   line-height: 1.5;
@@ -639,20 +841,21 @@ summary:focus-visible {
 }
 
 .form__consentimento input {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.375rem;
+  height: 1.375rem;
   flex: 0 0 auto;
-  margin: 0.15rem 0 0;
-  accent-color: var(--cor-primaria);
+  margin: 0;
+  accent-color: var(--cor-primaria-escura);
+  cursor: pointer;
 }
 
 .form__consentimento.erro {
-  color: #c0614a;
+  color: var(--cor-erro);
 }
 
 .form__aviso {
   text-align: center;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--cor-texto-claro);
 }
 
@@ -660,15 +863,26 @@ summary:focus-visible {
   text-align: center;
   font-size: 0.9rem;
   min-height: 1.2em;
-  grid-column: 1 / -1;
+}
+
+.form__status:empty {
+  display: none;
+}
+
+.form__status a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo-toque);
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 .form__status--erro {
-  color: #c0614a;
+  color: var(--cor-erro);
 }
 
 .form__status--ok {
-  color: #5a7a5e;
+  color: var(--cor-ok);
 }
 
 /* ---------- Contato / Mapa ---------- */
@@ -681,11 +895,13 @@ summary:focus-visible {
 @media (min-width: 820px) {
   .contato__grade {
     grid-template-columns: 1fr 1.4fr;
+    align-items: stretch;
   }
 }
 
 .contato__subtitulo {
   font-family: var(--fonte-titulo);
+  font-weight: 600;
   color: var(--cor-primaria-escura);
   font-size: 1.5rem;
   margin-bottom: 1rem;
@@ -694,15 +910,20 @@ summary:focus-visible {
 .contato__endereco {
   font-style: normal;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.25rem;
   color: var(--cor-texto-claro);
   margin-bottom: 1.5rem;
 }
 
 .contato__endereco a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo-toque);
   color: var(--cor-primaria-escura);
   font-weight: 600;
   text-decoration: underline;
+  text-underline-offset: 0.15em;
+  overflow-wrap: anywhere;
 }
 
 .contato__horario h4 {
@@ -715,96 +936,148 @@ summary:focus-visible {
   color: var(--cor-texto-claro);
 }
 
+.contato__mapa {
+  min-height: 0;
+}
+
 .contato__mapa iframe {
+  border: 0;
   border-radius: var(--raio);
   box-shadow: var(--sombra-card);
   width: 100%;
-  height: 320px;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  background: var(--sand);
+}
+
+@media (min-width: 820px) {
+  .contato__mapa iframe {
+    height: 100%;
+    min-height: 22rem;
+    aspect-ratio: auto;
+  }
 }
 
 /* ---------- Footer ---------- */
 .footer {
   background: var(--cor-primaria-escura);
   color: var(--cor-primaria-clara);
-  padding: 2.5rem 0;
+  /* Espaço extra embaixo para o botão flutuante não cobrir o texto */
+  padding: 2.5rem 0 calc(6rem + env(safe-area-inset-bottom));
   text-align: center;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
+  }
 }
 
 .footer__logo {
   font-family: var(--fonte-titulo);
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--cor-branco);
   margin-bottom: 0.5rem;
 }
 
 .footer__texto {
   font-size: 0.92rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .footer__nav {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  margin-bottom: 1.25rem;
+  gap: 0 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.footer__nav a:hover {
-  color: var(--cor-branco);
-  text-decoration: underline;
+.footer__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo-toque);
+  padding-inline: 0.6rem;
+}
+
+@media (hover: hover) {
+  .footer__nav a:hover {
+    color: var(--cor-branco);
+    text-decoration: underline;
+  }
+}
+
+.footer__nav a:focus-visible,
+.footer a:focus-visible {
+  outline-color: var(--cream);
 }
 
 .footer__copyright {
-  font-size: 0.82rem;
-  opacity: 0.75;
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 /* ---------- WhatsApp Flutuante ---------- */
 .whatsapp-flutuante {
   position: fixed;
-  right: 1.25rem;
-  bottom: 1.25rem;
+  right: calc(1rem + env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
   z-index: 200;
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--cor-whatsapp);
   color: var(--cor-branco);
   display: grid;
   place-items: center;
-  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+  box-shadow: 0 6px 18px rgba(19, 132, 63, 0.4);
   animation: pulso-whatsapp 2.4s ease-in-out infinite;
-  transition: var(--transicao);
+  transition: background-color var(--transicao), transform var(--transicao);
+  touch-action: manipulation;
 }
 
-.whatsapp-flutuante:hover {
-  background: var(--cor-whatsapp-escuro);
-  transform: scale(1.08);
+.whatsapp-flutuante:active {
+  transform: scale(0.94);
+}
+
+@media (hover: hover) {
+  .whatsapp-flutuante:hover {
+    background: var(--cor-whatsapp-escuro);
+    transform: scale(1.08);
+  }
+}
+
+@media (min-width: 768px) {
+  .whatsapp-flutuante {
+    right: calc(1.5rem + env(safe-area-inset-right));
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    width: 60px;
+    height: 60px;
+  }
 }
 
 @keyframes pulso-whatsapp {
   0%, 100% {
-    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45),
+    box-shadow: 0 6px 18px rgba(19, 132, 63, 0.4),
                 0 0 0 0 rgba(37, 211, 102, 0.5);
   }
   50% {
-    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45),
+    box-shadow: 0 6px 18px rgba(19, 132, 63, 0.4),
                 0 0 0 14px rgba(37, 211, 102, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .whatsapp-flutuante {
-    animation: none;
-  }
-
   html {
     scroll-behavior: auto;
   }
 
-  * {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

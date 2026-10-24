@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fdfcfa">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-title" content="Rosário CIA">
 
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -136,12 +139,17 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Fontes carregam sem bloquear a primeira pintura; display=swap mostra o texto já com a fonte do sistema -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600;700&display=swap"></noscript>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="header" id="topo">
     <nav class="nav container" aria-label="Navegação principal">
@@ -163,7 +171,7 @@
     </nav>
   </header>
 
-  <main>
+  <main id="conteudo" tabindex="-1">
 
     <section class="hero" aria-labelledby="hero-titulo">
       <div class="container hero__conteudo">
@@ -180,9 +188,9 @@
           <a href="#servicos" class="btn btn--secundario">Ver serviços e preços</a>
         </div>
         <ul class="hero__provas" aria-label="Destaques do salão">
-          <li>⭐ 5,0 no Google</li>
-          <li>📍 Campo Belo / Moema</li>
-          <li>📅 Sábados a partir das 9h</li>
+          <li><span aria-hidden="true">⭐</span> 5,0 no Google</li>
+          <li><span aria-hidden="true">📍</span> Campo Belo / Moema</li>
+          <li><span aria-hidden="true">📅</span> Sábados a partir das 9h</li>
         </ul>
       </div>
     </section>
@@ -266,7 +274,7 @@
 
         <div class="depoimentos__grade">
           <article class="depoimento">
-            <div class="depoimento__estrelas" aria-label="5 de 5 estrelas">★★★★★</div>
+            <div class="depoimento__estrelas" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
             <blockquote class="depoimento__texto">
               "Atendimento excelente!!!! Serviço nota 10"
             </blockquote>
@@ -280,7 +288,7 @@
           </article>
 
           <article class="depoimento">
-            <div class="depoimento__estrelas" aria-label="5 de 5 estrelas">★★★★★</div>
+            <div class="depoimento__estrelas" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
             <blockquote class="depoimento__texto">
               "Ótimo atendimento e ambiente acolhedor !Adorei!"
             </blockquote>
@@ -293,7 +301,7 @@
             </footer>
           </article>
           <article class="depoimento">
-            <div class="depoimento__estrelas" aria-label="5 de 5 estrelas">★★★★★</div>
+            <div class="depoimento__estrelas" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
             <blockquote class="depoimento__texto">
               "Unhas ficam perfeitas!"
             </blockquote>
@@ -314,7 +322,7 @@
         <figure class="sobre__foto">
           <img src="images/rosario.jpg"
                alt="Interior de salão de beleza com cadeiras de atendimento e espelhos iluminados"
-               loading="lazy" width="800" height="600">
+               loading="lazy" decoding="async" width="680" height="382">
         </figure>
         <article class="sobre__texto">
           <h2 class="secao__titulo" id="sobre-titulo">O salão no Campo Belo e Moema</h2>
@@ -331,10 +339,10 @@
             equipe do painel que organiza a agenda do salão.
           </p>
           <ul class="sobre__diferenciais">
-            <li>✔ Endereço na Av. Vereador José Diniz, Campo Belo</li>
-            <li>✔ Atendimento para a região de Moema</li>
-            <li>✔ Agendamento e cadastro direto pelo site</li>
-            <li>✔ Instagram atualizado: @rosariocabeleireirosecia</li>
+            <li><span aria-hidden="true">✔</span> Endereço na Av. Vereador José Diniz, Campo Belo</li>
+            <li><span aria-hidden="true">✔</span> Atendimento para a região de Moema</li>
+            <li><span aria-hidden="true">✔</span> Agendamento e cadastro direto pelo site</li>
+            <li><span aria-hidden="true">✔</span> Instagram atualizado: @rosariocabeleireirosecia</li>
           </ul>
         </article>
       </div>
@@ -380,12 +388,12 @@
         <form class="form" id="formAgendamento" novalidate>
           <div class="form__grupo">
             <label for="nome">Nome completo</label>
-            <input type="text" id="nome" name="nome" placeholder="Seu nome" maxlength="120" required autocomplete="name">
+            <input type="text" id="nome" name="nome" placeholder="Seu nome" maxlength="120" required autocomplete="name" autocapitalize="words" enterkeyhint="next">
           </div>
 
           <div class="form__grupo">
             <label for="telefone">Telefone</label>
-            <input type="tel" id="telefone" name="telefone" placeholder="(11) 95408-5967" required autocomplete="tel" inputmode="tel">
+            <input type="tel" id="telefone" name="telefone" placeholder="(11) 95408-5967" required autocomplete="tel" inputmode="tel" enterkeyhint="next">
           </div>
 
           <div class="form__grupo">
@@ -408,13 +416,13 @@
             <input type="date" id="data" name="data" required>
           </div>
 
-          <button type="submit" class="btn btn--primario btn--grande form__submit" id="btnEnviar">
-            Enviar pelo WhatsApp
-          </button>
           <label class="form__consentimento" for="consentimentoWhatsapp">
             <input type="checkbox" id="consentimentoWhatsapp" name="consentimentoWhatsapp" required>
             <span>Autorizo o registro do meu nome e telefone e o envio de uma mensagem de boas-vindas pelo WhatsApp.</span>
           </label>
+          <button type="submit" class="btn btn--primario btn--grande form__submit" id="btnEnviar">
+            Enviar pelo WhatsApp
+          </button>
           <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
           <p class="form__aviso">O horário ainda não está confirmado: o salão combinará os detalhes pelo WhatsApp.</p>
         </form>
@@ -430,10 +438,10 @@
           <div class="contato__info">
             <h3 class="contato__subtitulo">Rosário Cabeleireiros &amp; Cia</h3>
             <address class="contato__endereco">
-              <p>📍 Av. Vereador José Diniz, 3929 B — Campo Belo / Moema<br>São Paulo — SP, 04603-004</p>
+              <p><span aria-hidden="true">📍</span> Av. Vereador José Diniz, 3929 B — Campo Belo / Moema<br>São Paulo — SP, 04603-004</p>
               <p> <a href="tel:+5511954085967">(11) 95408-5967</a></p>
               <p> <a href="https://wa.me/5511954085967" class="js-link-whatsapp" target="_blank" rel="noopener">WhatsApp</a></p>
-              <p>📷 <a href="https://www.instagram.com/rosariocabeleireirosecia/" target="_blank" rel="noopener noreferrer">@rosariocabeleireirosecia</a></p>
+              <p><span aria-hidden="true">📷</span> <a href="https://www.instagram.com/rosariocabeleireirosecia/" target="_blank" rel="noopener noreferrer">@rosariocabeleireirosecia</a></p>
             </address>
             <div class="contato__horario">
               <h4>Horários</h4>
@@ -443,7 +451,7 @@
           <div class="contato__mapa">
             <iframe
               src="https://www.google.com/maps?q=Av.+Vereador+Jos%C3%A9+Diniz,+3929+B,+Campo+Belo,+S%C3%A3o+Paulo&amp;z=16&amp;output=embed"
-              width="100%" height="320" style="border:0" allowfullscreen loading="lazy"
+              width="600" height="450" allowfullscreen loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
               title="Mapa do Rosário Cabeleireiros e Cia na Av. Vereador José Diniz, Campo Belo">
             </iframe>
@@ -476,6 +484,6 @@
     </svg>
   </a>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
