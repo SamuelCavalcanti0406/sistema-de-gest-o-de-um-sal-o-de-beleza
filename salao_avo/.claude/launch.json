@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site-estatico",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:\\Users\\samuc\\AppData\\Local\\Temp\\claude\\C--Users-samuc-OneDrive-Desktop-sistema-de-gest-o-de-um-sal-o-de-beleza-salao-avo\\66545fd8-c3e3-4f12-bc4f-c500b3151765\\scratchpad\\serve.js",
+        "C:\\Users\\samuc\\OneDrive\\Desktop\\sistema-de-gest-o-de-um-sal-o-de-beleza\\salao_avo\\public",
+        "5510"
+      ],
+      "port": 5510
+    }
+  ]
+}
