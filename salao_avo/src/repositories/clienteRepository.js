@@ -7,6 +7,21 @@ class ClienteRepository {
         return linhas;
     }
 
+    async buscarPorTelefone(telefone) {
+        const db = await getDb();
+        const alvo = String(telefone || '').replace(/\D/g, '');
+        if (!alvo) return null;
+
+        const linhas = await db.all('SELECT id, nome, telefone FROM clientes');
+        return linhas.find((linha) => {
+            let numero = String(linha.telefone || '').replace(/\D/g, '');
+            if (!numero) return false;
+            const comDdi = numero.startsWith('55') ? numero : `55${numero}`;
+            const alvoComDdi = alvo.startsWith('55') ? alvo : `55${alvo}`;
+            return numero === alvo || comDdi === alvoComDdi;
+        }) || null;
+    }
+
     async criar(cliente) {
         const db = await getDb();
         const { nome, telefone, observacoes_alergias } = cliente;

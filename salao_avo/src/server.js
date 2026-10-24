@@ -25,6 +25,9 @@ app.get('/ping', (req, res) => {
     res.json({ mensagem: 'API do Salão operando perfeitamente!' });
 });
 
+const publicoController = require('./controllers/publicoController');
+app.post('/api/publico/leads', (req, res) => publicoController.criarLead(req, res));
+
 app.use('/api', (req, res, next) => {
     const configuredKey = process.env.ADMIN_API_KEY;
     const providedKey = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
