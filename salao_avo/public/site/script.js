@@ -222,6 +222,8 @@
           var boasVindas = resultado.boasVindas;
           var avisoBoasVindas = !resultado.novoCadastro
             ? " Esse telefone já estava cadastrado; não enviamos outra mensagem automática."
+            : boasVindas && boasVindas.status === "manual"
+              ? ""
             : boasVindas && boasVindas.status === "enviada"
               ? " A mensagem de boas-vindas foi enviada para seu número."
               : boasVindas && boasVindas.status === "na_fila"
@@ -235,12 +237,15 @@
             abriuWhatsApp ? null : url
           );
         })
-        .catch(function (err) {
-          if (janelaWhatsApp && !janelaWhatsApp.closed) janelaWhatsApp.close();
+        .catch(function () {
+          // Sem a API o cliente ainda segue pelo WhatsApp com a mensagem pronta.
+          var url = urlWhatsApp(mensagem);
+          var abriuWhatsApp = abrirWhatsApp(mensagem, janelaWhatsApp);
           setStatus(
-            (err && err.message ? err.message + " " : "") +
-              "Seu contato não foi confirmado. Tente novamente antes de abrir o WhatsApp.",
-            "erro"
+            "Não conseguimos salvar seu contato pelo site agora, mas você pode agendar direto pelo WhatsApp." +
+              (abriuWhatsApp ? " Abrindo o WhatsApp…" : " Continue pelo link:"),
+            "ok",
+            abriuWhatsApp ? null : url
           );
         })
         .finally(function () {
