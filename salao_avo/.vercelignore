@@ -1,0 +1,11 @@
+.claude
+.vscode
+.env
+.env.*
+!.env.example
+.wwebjs_auth
+.wwebjs_cache
+*.sqlite
+*.sqlite-journal
+*.db
+node_modules

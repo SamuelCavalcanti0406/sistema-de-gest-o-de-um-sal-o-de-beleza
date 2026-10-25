@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rosario-cabeleireiros.vercel.app/sitemap.xml

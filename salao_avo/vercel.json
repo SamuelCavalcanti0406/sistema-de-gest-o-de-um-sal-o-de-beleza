@@ -1,6 +1,10 @@
 {
+  "framework": null,
   "outputDirectory": "public/site",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
   ]
 }

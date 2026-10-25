@@ -11,3 +11,5 @@ yarn-debug.log*
 .DS_Store
 DOCUMENTAÇÃO_SEGURANÇA.pdf
 
+
+.vercel
